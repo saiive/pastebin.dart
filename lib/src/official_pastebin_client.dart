@@ -125,9 +125,7 @@ class OfficialPastebinClient extends PastebinClient {
       'api_paste_key': pasteKey,
     };
 
-    final apiOption = visibility == Visibility.public
-        ? ApiOption.rawPaste
-        : ApiOption.userRawPaste;
+    final apiOption = visibility == Visibility.public ? ApiOption.rawPaste : ApiOption.userRawPaste;
 
     if (apiOption == ApiOption.userRawPaste) {
       body['api_user_key'] = userKey;
@@ -177,19 +175,15 @@ class OfficialPastebinClient extends PastebinClient {
     try {
       final url = apiOption.url();
 
-      final formMap = <String, String>{
-        'api_option': apiOption.value(),
-        'api_dev_key': apiDevKey,
-        ...body
-      };
+      final formMap = <String, String>{'api_option': apiOption.value(), 'api_dev_key': apiDevKey, ...body};
 
       http.Response response;
 
       if (apiOption == ApiOption.rawPaste) {
-        response = await _httpClient.get('$url/${body['api_paste_key']}');
+        response = await _httpClient.get(Uri.parse('$url/${body['api_paste_key']}'));
       } else {
         response = await _httpClient.post(
-          url,
+          Uri.parse(url),
           body: formMap,
           encoding: utf8,
         );
@@ -199,9 +193,7 @@ class OfficialPastebinClient extends PastebinClient {
         (l) => Left(l),
         (r) {
           if (_apiDevKeys.length > 1) {
-            if (r is ExceededMaximumNumberOfPrivatePastes ||
-                r is ExceededMaximumNumberOfUnlistedPastes ||
-                r is InvalidApiDevKey) {
+            if (r is ExceededMaximumNumberOfPrivatePastes || r is ExceededMaximumNumberOfUnlistedPastes || r is InvalidApiDevKey) {
               _apiDevKeys.removeAt(0);
 
               return apiRequest(body: body, apiOption: apiOption);
